@@ -28,7 +28,43 @@ from scoring import (
     evaluar_riesgo,
 )
 
-st.set_page_config(page_title="Monitoreo de fraude", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Monitoreo de fraude", layout="wide")
+
+# ---------------------------------------------------------------------------
+# Estilo: tipografía IBM Plex y paleta propia (colores base en .streamlit/config.toml)
+# ---------------------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+    html, body, .stApp, .stApp p, .stApp label, .stApp li, .stApp input,
+    .stApp textarea, .stApp button, .stApp h1, .stApp h2, .stApp h3, .stApp h4,
+    [data-testid="stMarkdownContainer"], [data-testid="stWidgetLabel"],
+    [data-testid="stCaptionContainer"], [data-baseweb="select"] div {
+        font-family: 'IBM Plex Sans', sans-serif !important;
+    }
+    .stApp h1, .stApp h2, .stApp h3 { color: #13233a; letter-spacing: -0.01em; }
+    .stApp h3 { font-weight: 600; font-size: 1.15rem; margin-top: .6rem;
+                padding-bottom: .35rem; border-bottom: 1px solid #ddd6c8; }
+    [data-testid="stSidebar"] { border-right: 1px solid #ddd6c8; }
+    [data-testid="stSidebar"] h2 { font-size: 1rem; text-transform: uppercase;
+                                   letter-spacing: .08em; color: #5b6472; }
+    .stApp button[kind="primary"] { font-weight: 600; letter-spacing: .02em;
+                                    padding: .55rem 1.6rem; border-radius: 6px; }
+    .encabezado .kicker { font-size: .78rem; font-weight: 600; letter-spacing: .14em;
+                          text-transform: uppercase; color: #0e5a5f; margin-bottom: .2rem; }
+    .encabezado .titulo { font-size: 2.1rem; font-weight: 700; color: #13233a;
+                          line-height: 1.15; margin: 0 0 .5rem 0; }
+    .encabezado .sub { color: #4a5363; max-width: 760px; font-size: 1rem; margin-bottom: 1.4rem; }
+    [data-testid="stDecoration"] { display: none; }
+    [data-testid="stFileUploaderDropzone"] svg,
+    [data-testid="stFileUploaderFile"] > div:first-child { display: none; }
+    .num { font-family: 'IBM Plex Mono', monospace !important; font-variant-numeric: tabular-nums; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # ---------------------------------------------------------------------------
 # Registro de uso: una línea JSON por predicción o error. Va a stdout (pestaña
@@ -63,9 +99,9 @@ CAMPOS_TX = ["monto", "hora", "canal", "categoria", "es_nuevo", "horas_desde_ult
 MAX_TX = scoring.W_COMPLETO  # 10
 
 COLORES = {
-    "verde": ("#1e8e3e", "#e6f4ea", "Riesgo bajo"),
-    "ámbar": ("#f29900", "#fef7e0", "Riesgo intermedio — vigilar"),
-    "rojo": ("#d93025", "#fce8e6", "Riesgo alto"),
+    "verde": ("#2e7d4f", "#e7f1ea", "Riesgo bajo"),
+    "ámbar": ("#b7791f", "#f7eedb", "Riesgo intermedio, vigilar"),
+    "rojo": ("#a63232", "#f5e3e1", "Riesgo alto"),
 }
 
 # Campos agregados que el usuario ingresa (los demás se derivan de la última tx).
@@ -228,44 +264,60 @@ def leer_csv(archivo) -> pd.DataFrame:
 
 def mostrar_resultado(res: dict):
     color, fondo, etiqueta = COLORES[res["semaforo"]]
-    c1, c2, c3 = st.columns([1, 1, 2])
-
-    with c1:
-        st.markdown(
-            f"""
-            <div style="text-align:center;padding:14px;border-radius:14px;background:{fondo};">
-              <div style="width:92px;height:92px;border-radius:50%;background:{color};
-                          margin:0 auto 8px auto;box-shadow:0 0 18px {color}66;"></div>
-              <div style="font-weight:700;color:{color};font-size:1.1rem;">{res['semaforo'].upper()}</div>
-              <div style="color:#444;font-size:.85rem;">{etiqueta}</div>
+    p = min(max(float(res["puntuacion"]), 0.0), 1.0)
+    u = float(res["umbral"])
+    st.markdown(
+        f"""
+        <div style="border:1px solid #ddd6c8;border-left:6px solid {color};border-radius:8px;
+                    background:#fffdf9;padding:20px 24px;margin:4px 0 10px 0;">
+          <div style="display:flex;flex-wrap:wrap;gap:36px;align-items:flex-end;">
+            <div>
+              <div style="font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#5b6472;">Puntuación de riesgo</div>
+              <div class="num" style="font-size:2.6rem;font-weight:600;color:{color};line-height:1.1;">{res["puntuacion_pct"]}</div>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with c2:
-        st.metric("Puntuación de riesgo", res["puntuacion_pct"])
-        st.metric("Umbral de decisión", f"{res['umbral'] * 100:.1f}%")
-    with c3:
-        st.metric("Decisión", res["decision"].upper())
-        st.progress(min(max(float(res["puntuacion"]), 0.0), 1.0))
-        if res["decision"] == "bloquear":
-            st.error(res["recomendacion"])
-        else:
-            st.success(res["recomendacion"])
+            <div>
+              <div style="font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#5b6472;">Decisión</div>
+              <div style="font-size:1.6rem;font-weight:700;color:#13233a;line-height:1.3;">{res["decision"].upper()}</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#5b6472;">Nivel</div>
+              <div style="display:inline-block;margin-top:6px;padding:4px 12px;border-radius:4px;
+                          background:{fondo};color:{color};font-weight:600;">{etiqueta}</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#5b6472;">Umbral</div>
+              <div class="num" style="font-size:1.3rem;color:#13233a;line-height:1.6;">{u * 100:.1f}%</div>
+            </div>
+          </div>
+          <div style="position:relative;height:8px;background:#ece7dc;border-radius:4px;margin:18px 0 6px 0;">
+            <div style="width:{p * 100:.2f}%;height:100%;background:{color};border-radius:4px;"></div>
+            <div style="position:absolute;left:{u * 100:.2f}%;top:-5px;width:2px;height:18px;background:#13233a;"></div>
+          </div>
+          <div style="font-size:.85rem;color:#4a5363;">{res["recomendacion"]}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.caption(
-        "Semáforo: verde si la puntuación < umbral/2, ámbar entre umbral/2 y el umbral, "
-        "rojo si ≥ umbral (la transacción se bloquea)."
+        "Verde si la puntuación es menor a la mitad del umbral, ámbar entre la mitad y el umbral, "
+        "rojo si llega al umbral (la transacción se bloquea). La línea oscura en la barra marca el umbral."
     )
 
 
 # ---------------------------------------------------------------------------
 # Interfaz
 # ---------------------------------------------------------------------------
-st.title("🛡️ Monitoreo transaccional de fraude")
-st.write(
-    "Ingrese las últimas transacciones de un cliente (la más reciente al final) y sus "
-    "variables agregadas. El modelo híbrido GRU + Regresión Logística estima la "
-    "probabilidad de fraude de la **última** transacción."
+st.markdown(
+    """
+    <div class="encabezado">
+      <div class="kicker">Banco del Altiplano · Operaciones antifraude</div>
+      <div class="titulo">Monitoreo transaccional de fraude</div>
+      <div class="sub">Ingrese las últimas transacciones de un cliente (la más reciente al final)
+      y sus variables agregadas. El modelo híbrido GRU + Regresión Logística estima la
+      probabilidad de fraude de la <b>última</b> transacción.</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 try:
@@ -280,7 +332,7 @@ except Exception as e:  # noqa: BLE001
 EJ = ejemplos()
 
 with st.sidebar:
-    st.header("Ejemplos")
+    st.header("Ejemplos", anchor=False)
     nombre_ej = st.selectbox("Cargar ejemplo", list(EJ.keys()), index=0)
     st.caption(f"Umbral de decisión del modelo: **{UMBRAL:.3f}**")
     st.markdown("---")
@@ -298,7 +350,7 @@ df_entrada = None
 error_entrada = None
 
 if modo == "Formulario":
-    st.subheader("1. Últimas transacciones")
+    st.subheader("1. Últimas transacciones", anchor=False)
     df_entrada = st.data_editor(
         df_ej,
         key=f"editor_{ks}",
@@ -314,7 +366,7 @@ if modo == "Formulario":
         },
     )
 else:
-    st.subheader("1. Subir CSV")
+    st.subheader("1. Subir CSV", anchor=False)
     plantilla = df_ej.to_csv(index=False)
     st.download_button("Descargar plantilla CSV", plantilla, "transacciones_ejemplo.csv", "text/csv")
     archivo = st.file_uploader("CSV con columnas: " + ", ".join(CAMPOS_TX), type=["csv"])
@@ -326,7 +378,7 @@ else:
             error_entrada = str(e)
             st.error(error_entrada)
 
-st.subheader("2. Variables agregadas del cliente")
+st.subheader("2. Variables agregadas del cliente", anchor=False)
 cols = st.columns(4)
 manuales = {}
 for i, (clave, (etiqueta, minimo, _, tipo)) in enumerate(AGG_MANUALES.items()):
@@ -359,7 +411,7 @@ if st.button("Calcular riesgo", type="primary"):
         agregadas = construir_agregadas(transacciones[-1], manuales)
         resultado = evaluar_riesgo(transacciones, agregadas)
 
-        st.subheader("Resultado")
+        st.subheader("Resultado", anchor=False)
         mostrar_resultado(resultado)
         registrar_uso("prediccion", origen=modo, ejemplo=nombre_ej, n_tx=len(transacciones),
                       puntuacion=round(float(resultado["puntuacion"]), 6),

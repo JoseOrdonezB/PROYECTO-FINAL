@@ -1,5 +1,5 @@
 exceptions on load: []
-Transacción legítima | exc: [] | ['Puntuación de riesgo=2.7%', 'Umbral de decisión=7.5%', 'Decisión=AUTORIZAR'] | ['Autorizar transacción. Puntuación de riesgo 2.7% (umbral 7.5%).']
-Transacción fraudulenta (escalada rápida) | exc: [] | ['Bloquear transacción. Puntuación de riesgo 100.0% (umbral 7.5%). Enviar a revisión manual.', 'Puntuación de riesgo=100.0%', 'Umbral de decisión=7.5%', 'Decisión=BLOQUEAR'] | []
-Caso límite (zona ámbar) | exc: [] | ['Puntuación de riesgo=6.3%', 'Umbral de decisión=7.5%', 'Decisión=AUTORIZAR'] | ['Autorizar transacción. Puntuación de riesgo 6.3% (umbral 7.5%).']
-En blanco | exc: [] | ['Puntuación de riesgo=0.0%', 'Umbral de decisión=7.5%', 'Decisión=AUTORIZAR'] | ['Autorizar transacción. Puntuación de riesgo 0.0% (umbral 7.5%).']
+Transacción legítima | exc: [] | errores: [] | Autorizar transacción. Puntuación de riesgo 2.7% (umbral 7.5%).
+Transacción fraudulenta (escalada rápida) | exc: [] | errores: [] | Bloquear transacción. Puntuación de riesgo 100.0% (umbral 7.5%). Enviar a revisión manual.
+Caso límite (zona ámbar) | exc: [] | errores: [] | Autorizar transacción. Puntuación de riesgo 6.3% (umbral 7.5%).
+En blanco | exc: [] | errores: [] | Autorizar transacción. Puntuación de riesgo 0.0% (umbral 7.5%).
