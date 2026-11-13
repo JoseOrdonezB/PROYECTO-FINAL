@@ -6,7 +6,7 @@ Deep Learning y Sistemas Inteligentes, Universidad del Valle de Guatemala, 2026.
 
 **Repositorio:** https://github.com/JoseOrdonezB/PROYECTO-FINAL
 
-**App en producción:** URL_DE_LA_APP (Streamlit Community Cloud)
+**App en producción:** https://monitoreo-fraude-uvg.streamlit.app (Streamlit Community Cloud)
 
 Este repo pone en producción el **modelo C** del Proyecto 1 (monitoreo transaccional del
 Banco del Altiplano): un híbrido que junta el estado oculto de una GRU con las variables
@@ -230,7 +230,7 @@ presentacion.pdf            presentación del proyecto final
 
 ## 7. Evidencias del pase a producción
 
-**Enlace al servicio:** URL_DE_LA_APP
+**Enlace al servicio:** https://monitoreo-fraude-uvg.streamlit.app
 
 **Nota sobre el hosting.** El plan original era Hugging Face Spaces, pero al crear el Space
 la API respondió `402 Payment Required`: desde 2026 los Spaces de Docker y Gradio en CPU
