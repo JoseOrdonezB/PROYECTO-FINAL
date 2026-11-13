@@ -5,19 +5,54 @@ para detección de fraude transaccional.
 Extraído del notebook Proyecto 1 (modelo C validado).
 SOLO INFERENCIA: no reentrena nada. Carga los artefactos ya entrenados.
 
-Entrada
--------
-  - transacciones : lista de dict (o filas ordenadas cronológicamente, más
-    reciente al final) con las últimas N (<= 10) transacciones del cliente.
-    Cada una requiere: monto, hora, canal, categoria, es_nuevo,
-    horas_desde_ultima.
-  - agregadas : dict/list con las 13 variables agregadas del cliente en el
-    orden de artefactos/columnas_agregadas.json.
+===============================================================================
+CONTRATO DE ENTRADA / SALIDA
+===============================================================================
 
-Salida
-------
-  dict con: puntuacion (float en [0,1]), decision ("bloquear"/"autorizar"),
-  umbral usado.
+Entrada de score_transaccion():
+  - transacciones : list[dict]
+      Últimas N (<= 10) transacciones del cliente, ordenadas cronológicamente
+      (la más reciente al final). Cada dict requiere las claves:
+          monto           (float >= 0)
+          hora            (float, 0-23)
+          canal           (str en {"POS", "online", "ATM"})
+          categoria       (str en {"comida","retail","viajes","entretenimiento","servicios"})
+          es_nuevo        (int 0/1)
+          horas_desde_ultima (float >= 0)
+      Si hay menos de 10 transacciones, se rellena a la izquierda con ceros
+      (sin fuga de futuro). No se admiten listas vacías.
+  - agregadas : dict | list | np.ndarray
+      13 variables agregadas del cliente en el orden de
+      artefactos/columnas_agregadas.json:
+          n_tx_1h, n_tx_24h, div_comercio_7d, div_canal_7d,
+          ratio_monto_hist, n_tx_historicas, hora, es_fin_semana,
+          es_comercio_nuevo, log_monto, log_monto_prom_24h,
+          log_monto_max_dia, log_horas_desde_ultima
+      Si se pasa dict, se leen por nombre. Si se pasa list/np.ndarray, se usa
+      el orden exacto de columnas_agregadas.json.
+  - umbral : float opcional (default: 0.075, de parametros_preparacion.json)
+
+Salida:
+  dict con claves:
+      puntuacion : float en [0, 1]  (probabilidad de fraude)
+      decision   : "bloquear" | "autorizar"  (>= umbral -> bloquear)
+      umbral     : float usado para la decisión
+
+Excepciones:
+  - EntradaInvalidaError : campos faltantes, canal/categoría desconocidos,
+                           tipos incorrectos, lista vacía.
+  - ArtefactosNoEncontradosError : falta algún archivo en artefactos/.
+
+Uso desde app.py (Persona B):
+    from scoring import score_transaccion, EntradaInvalidaError
+
+    try:
+        resultado = score_transaccion(transacciones, agregadas)
+        puntuacion = resultado["puntuacion"]   # float
+        decision   = resultado["decision"]     # "bloquear" / "autorizar"
+    except EntradaInvalidaError as e:
+        # manejar error de entrada del usuario
+        ...
 """
 
 import json
@@ -26,6 +61,19 @@ import pickle
 from typing import Any, Dict, List, Union
 
 import numpy as np
+
+# ---------------------------------------------------------------------------
+# Excepciones personalizadas para manejo limpio desde app.py.
+# ---------------------------------------------------------------------------
+class EntradaInvalidaError(ValueError):
+    """Se lanza cuando los datos de entrada no cumplen el contrato."""
+    pass
+
+
+class ArtefactosNoEncontradosError(FileNotFoundError):
+    """Se lanza cuando falta algún archivo requerido en artefactos/."""
+    pass
+
 
 # ---------------------------------------------------------------------------
 # Rutas de artefactos (relativas a este archivo, para que funcione desde
@@ -51,6 +99,9 @@ _MODEL_C = None
 _SCALER_AGG = None
 _UMBRAL = 0.075
 
+# Campos obligatorios de cada transacción.
+_CAMPOS_TX = ["monto", "hora", "canal", "categoria", "es_nuevo", "horas_desde_ultima"]
+
 
 # ---------------------------------------------------------------------------
 # Utilidades numéricas (idénticas al notebook).
@@ -60,11 +111,106 @@ def sigmoid(x: np.ndarray) -> np.ndarray:
 
 
 # ---------------------------------------------------------------------------
+# Validación de entrada.
+# ---------------------------------------------------------------------------
+def _validar_transaccion(tx: dict, idx: int) -> None:
+    """Valida que un dict de transacción tenga todos los campos y valores válidos."""
+    if not isinstance(tx, dict):
+        raise EntradaInvalidaError(
+            f"transacciones[{idx}] debe ser un dict, se recibió {type(tx).__name__}."
+        )
+
+    faltantes = [c for c in _CAMPOS_TX if c not in tx]
+    if faltantes:
+        raise EntradaInvalidaError(
+            f"transacciones[{idx}] le faltan campos: {faltantes}. "
+            f"Campos requeridos: {_CAMPOS_TX}"
+        )
+
+    # Validar tipos numéricos
+    for campo in ["monto", "hora", "es_nuevo", "horas_desde_ultima"]:
+        valor = tx[campo]
+        if not isinstance(valor, (int, float, np.integer, np.floating)):
+            raise EntradaInvalidaError(
+                f"transacciones[{idx}]['{campo}'] debe ser numérico, "
+                f"se recibió {type(valor).__name__}."
+            )
+
+    # Validar rangos
+    monto = float(tx["monto"])
+    hora = float(tx["hora"])
+    horas_ultima = float(tx["horas_desde_ultima"])
+
+    if monto < 0:
+        raise EntradaInvalidaError(
+            f"transacciones[{idx}]['monto'] debe ser >= 0, se recibió {monto}."
+        )
+    if not (0 <= hora <= 23):
+        raise EntradaInvalidaError(
+            f"transacciones[{idx}]['hora'] debe estar entre 0 y 23, se recibió {hora}."
+        )
+    if horas_ultima < 0:
+        raise EntradaInvalidaError(
+            f"transacciones[{idx}]['horas_desde_ultima'] debe ser >= 0, "
+            f"se recibió {horas_ultima}."
+        )
+
+    # Validar canal y categoría (one-hot)
+    canal = tx["canal"]
+    categoria = tx["categoria"]
+    if canal not in CHANNELS:
+        raise EntradaInvalidaError(
+            f"transacciones[{idx}]['canal'] = '{canal}' no es válido. "
+            f"Valores permitidos: {CHANNELS}"
+        )
+    if categoria not in MERCHANT_CATS:
+        raise EntradaInvalidaError(
+            f"transacciones[{idx}]['categoria'] = '{categoria}' no es válido. "
+            f"Valores permitidos: {MERCHANT_CATS}"
+        )
+
+
+def _validar_agregadas(agregadas: Union[dict, list, np.ndarray]) -> None:
+    """Valida que las agregadas tengan el tamaño y formato correctos."""
+    if isinstance(agregadas, dict):
+        faltantes = [c for c in AGG_COLS if c not in agregadas]
+        if faltantes:
+            raise EntradaInvalidaError(
+                f"agregadas le faltan columnas: {faltantes}. "
+                f"Columnas esperadas ({len(AGG_COLS)}): {AGG_COLS}"
+            )
+    else:
+        valores = list(agregadas)
+        if len(valores) != len(AGG_COLS):
+            raise EntradaInvalidaError(
+                f"agregadas debe tener {len(AGG_COLS)} valores, "
+                f"se recibieron {len(valores)}. "
+                f"Orden esperado: {AGG_COLS}"
+            )
+
+
+# ---------------------------------------------------------------------------
 # Carga de artefactos.
 # ---------------------------------------------------------------------------
 def _cargar_artefactos() -> None:
     """Carga los 5 artefactos desde ART_DIR y deja los objetos listos."""
     global _GRU, _MODEL_C, _SCALER_AGG, _UMBRAL, AGG_COLS
+
+    # Verificar que existan todos los artefactos antes de abrir nada.
+    requeridos = [
+        "modelo_B_gru_pesos.npz",
+        "modelo_C_logreg.pkl",
+        "scaler_agg.pkl",
+        "columnas_agregadas.json",
+        "parametros_preparacion.json",
+    ]
+    faltantes = [a for a in requeridos
+                 if not os.path.exists(os.path.join(ART_DIR, a))]
+    if faltantes:
+        raise ArtefactosNoEncontradosError(
+            f"Faltan artefactos en {ART_DIR}: {faltantes}. "
+            f"Asegúrese de subir la carpeta artefactos/ al repositorio."
+        )
 
     # 1) Pesos del GRU (modelo B) — forward-only.
     npz_path = os.path.join(ART_DIR, "modelo_B_gru_pesos.npz")
@@ -230,7 +376,7 @@ def _extraer_agregadas(agregadas: Union[dict, list, np.ndarray]) -> np.ndarray:
         try:
             valores = [agregadas[col] for col in AGG_COLS]
         except KeyError as e:
-            raise KeyError(
+            raise EntradaInvalidaError(
                 f"Falta la columna agregada '{e.args[0]}'. "
                 f"Columnas esperadas ({len(AGG_COLS)}): {AGG_COLS}"
             )
@@ -238,8 +384,9 @@ def _extraer_agregadas(agregadas: Union[dict, list, np.ndarray]) -> np.ndarray:
         valores = list(agregadas)
 
     if len(valores) != len(AGG_COLS):
-        raise ValueError(
-            f"agregadas debe tener {len(AGG_COLS)} valores, se recibieron {len(valores)}. "
+        raise EntradaInvalidaError(
+            f"agregadas debe tener {len(AGG_COLS)} valores, "
+            f"se recibieron {len(valores)}. "
             f"Orden esperado: {AGG_COLS}"
         )
     return np.asarray(valores, dtype=np.float64).reshape(1, -1)
@@ -271,7 +418,25 @@ def score_transaccion(
         puntuacion : float en [0, 1]
         decision   : "bloquear" | "autorizar"
         umbral     : float usado
+
+    Raises
+    ------
+    EntradaInvalidaError
+        Si los datos de entrada no cumplen el contrato.
+    ArtefactosNoEncontradosError
+        Si falta algún archivo en artefactos/.
     """
+    # Validar entrada antes de tocar artefactos.
+    if not isinstance(transacciones, list) or len(transacciones) == 0:
+        raise EntradaInvalidaError(
+            "transacciones debe ser una lista no vacía de dicts."
+        )
+
+    for i, tx in enumerate(transacciones):
+        _validar_transaccion(tx, i)
+
+    _validar_agregadas(agregadas)
+
     # Asegurar que los artefactos estén cargados.
     if _GRU is None:
         _cargar_artefactos()
@@ -297,6 +462,57 @@ def score_transaccion(
         "puntuacion": round(puntuacion, 6),
         "decision": decision,
         "umbral": umbral,
+    }
+
+
+def evaluar_riesgo(
+    transacciones: List[dict],
+    agregadas: Union[dict, list, np.ndarray],
+) -> dict:
+    """
+    Wrapper amigable para app.py (Persona B). Devuelve un resultado listo
+    para mostrar en la interfaz, incluyendo semáforo y recomendación de texto.
+
+    Retorna
+    -------
+    dict con claves:
+        puntuacion     : float en [0, 1]
+        decision       : "bloquear" | "autorizar"
+        umbral         : float
+        semaforo       : "verde" | "ámbar" | "rojo"
+        recomendacion  : str legible para el usuario
+        puntuacion_pct : str (ej. "85.2%")
+    """
+    resultado = score_transaccion(transacciones, agregadas)
+    p = resultado["puntuacion"]
+    u = resultado["umbral"]
+
+    # Semáforo: verde < umbral/2, ámbar entre umbral/2 y umbral, rojo >= umbral
+    if p < u / 2:
+        semaforo = "verde"
+    elif p < u:
+        semaforo = "ámbar"
+    else:
+        semaforo = "rojo"
+
+    if resultado["decision"] == "bloquear":
+        recomendacion = (
+            f"Bloquear transacción. Puntuación de riesgo {p*100:.1f}% "
+            f"(umbral {u*100:.1f}%). Enviar a revisión manual."
+        )
+    else:
+        recomendacion = (
+            f"Autorizar transacción. Puntuación de riesgo {p*100:.1f}% "
+            f"(umbral {u*100:.1f}%)."
+        )
+
+    return {
+        "puntuacion": resultado["puntuacion"],
+        "decision": resultado["decision"],
+        "umbral": resultado["umbral"],
+        "semaforo": semaforo,
+        "recomendacion": recomendacion,
+        "puntuacion_pct": f"{p*100:.1f}%",
     }
 
 
