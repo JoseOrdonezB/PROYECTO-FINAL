@@ -1,0 +1,311 @@
+{
+  "descripcion_datos": {
+    "n_total": 41975,
+    "n_train": 25185,
+    "n_val": 8395,
+    "n_test": 8395,
+    "frac_fraude": 0.00714711137581894,
+    "dia_corte_train": 26.944337131626185,
+    "dia_corte_val": 35.78140386683905,
+    "conteo_por_tipo": {
+      "cambio_canal": 220,
+      "escalada_lenta": 218,
+      "escalada_rapida": 518,
+      "fraude_sigiloso": 50,
+      "legitima": 40921,
+      "monto_atipico": 48
+    },
+    "positivos_por_tipo": {
+      "cambio_canal": 55,
+      "escalada_lenta": 43,
+      "escalada_rapida": 104,
+      "fraude_sigiloso": 50,
+      "monto_atipico": 48
+    }
+  },
+  "modelo_A": {
+    "val": {
+      "auc_pr": 0.8690827056394511,
+      "precision": 0.6336633663366337,
+      "recall": 0.8533333333333334,
+      "f1": 0.7272727272727273,
+      "n_pos": 75,
+      "n": 8395
+    },
+    "test_auc_pr": 0.9379555942463909
+  },
+  "modelo_B": {
+    "val": {
+      "auc_pr": 0.9018977296663026,
+      "precision": 0.6194690265486725,
+      "recall": 0.9333333333333333,
+      "f1": 0.7446808510638298,
+      "n_pos": 75,
+      "n": 8395
+    },
+    "test_auc_pr": 0.9558399313450763
+  },
+  "historial_entrenamiento_B": [
+    {
+      "epoch": 0,
+      "loss": 0.4311131345245979,
+      "val_auc_pr": 0.7168537614367296
+    },
+    {
+      "epoch": 1,
+      "loss": 0.22770626575486924,
+      "val_auc_pr": 0.7361454444943237
+    },
+    {
+      "epoch": 2,
+      "loss": 0.16194511406122944,
+      "val_auc_pr": 0.771693379311955
+    },
+    {
+      "epoch": 3,
+      "loss": 0.16242198905370822,
+      "val_auc_pr": 0.7300654921196938
+    },
+    {
+      "epoch": 4,
+      "loss": 0.12884378016712225,
+      "val_auc_pr": 0.7780767529050528
+    },
+    {
+      "epoch": 5,
+      "loss": 0.09626574087966595,
+      "val_auc_pr": 0.8738300714092326
+    },
+    {
+      "epoch": 6,
+      "loss": 0.06717252891801437,
+      "val_auc_pr": 0.7636179345372376
+    },
+    {
+      "epoch": 7,
+      "loss": 0.056660892574550065,
+      "val_auc_pr": 0.8952144165535524
+    },
+    {
+      "epoch": 8,
+      "loss": 0.0562905900572963,
+      "val_auc_pr": 0.805836405518458
+    },
+    {
+      "epoch": 9,
+      "loss": 0.05056063211946521,
+      "val_auc_pr": 0.7642353588764436
+    },
+    {
+      "epoch": 10,
+      "loss": 0.06825580973156116,
+      "val_auc_pr": 0.862110634506138
+    },
+    {
+      "epoch": 11,
+      "loss": 0.08595117125273481,
+      "val_auc_pr": 0.850528248819126
+    },
+    {
+      "epoch": 12,
+      "loss": 0.12538200665757532,
+      "val_auc_pr": 0.8101063170608293
+    },
+    {
+      "epoch": 13,
+      "loss": 0.11337169945957341,
+      "val_auc_pr": 0.8330532241514808
+    },
+    {
+      "epoch": 14,
+      "loss": 0.06319359619233023,
+      "val_auc_pr": 0.8583265487934788
+    },
+    {
+      "epoch": 15,
+      "loss": 0.04064489007139975,
+      "val_auc_pr": 0.8974231527925498
+    },
+    {
+      "epoch": 16,
+      "loss": 0.02417919979390914,
+      "val_auc_pr": 0.9051674195920998
+    },
+    {
+      "epoch": 17,
+      "loss": 0.018051955124958056,
+      "val_auc_pr": 0.917743344628984
+    },
+    {
+      "epoch": 18,
+      "loss": 0.013339855227821253,
+      "val_auc_pr": 0.9190676200225314
+    },
+    {
+      "epoch": 19,
+      "loss": 0.012176751855475725,
+      "val_auc_pr": 0.9199298846791892
+    },
+    {
+      "epoch": 20,
+      "loss": 0.010556779237712775,
+      "val_auc_pr": 0.9178319552372577
+    },
+    {
+      "epoch": 21,
+      "loss": 0.009375645191419481,
+      "val_auc_pr": 0.9216861470152552
+    },
+    {
+      "epoch": 22,
+      "loss": 0.008694209143037783,
+      "val_auc_pr": 0.9172798320958024
+    },
+    {
+      "epoch": 23,
+      "loss": 0.008750471586156444,
+      "val_auc_pr": 0.9180939940248295
+    },
+    {
+      "epoch": 24,
+      "loss": 0.006969820906766822,
+      "val_auc_pr": 0.9209639947656051
+    },
+    {
+      "epoch": 25,
+      "loss": 0.006525124051465162,
+      "val_auc_pr": 0.9278482809372463
+    },
+    {
+      "epoch": 26,
+      "loss": 0.006133838501960069,
+      "val_auc_pr": 0.9228951822364538
+    },
+    {
+      "epoch": 27,
+      "loss": 0.006681306450456303,
+      "val_auc_pr": 0.9216334099508163
+    },
+    {
+      "epoch": 28,
+      "loss": 0.0076121810496231615,
+      "val_auc_pr": 0.9070753717988526
+    },
+    {
+      "epoch": 29,
+      "loss": 0.01393680235837328,
+      "val_auc_pr": 0.9018977296663026
+    }
+  ],
+  "prueba_permutacion": {
+    "auc_pr_original": 0.9018977296663026,
+    "auc_pr_permutado": 0.819305848117505,
+    "caida_relativa_pct": 9.157566188724763,
+    "por_tipo_score_medio_original": {
+      "cambio_canal": {
+        "n": 16,
+        "score_medio": 0.8503204997704042
+      },
+      "escalada_lenta": {
+        "n": 12,
+        "score_medio": 0.9911035110888737
+      },
+      "escalada_rapida": {
+        "n": 24,
+        "score_medio": 0.9999926041157331
+      },
+      "fraude_sigiloso": {
+        "n": 12,
+        "score_medio": 0.7881878293883942
+      },
+      "monto_atipico": {
+        "n": 11,
+        "score_medio": 0.9057069822247659
+      }
+    },
+    "por_tipo_score_medio_permutado": {
+      "cambio_canal": {
+        "n": 16,
+        "score_medio": 0.3182051206682899
+      },
+      "escalada_lenta": {
+        "n": 12,
+        "score_medio": 0.9976655367301265
+      },
+      "escalada_rapida": {
+        "n": 24,
+        "score_medio": 0.9995074006495406
+      },
+      "fraude_sigiloso": {
+        "n": 12,
+        "score_medio": 0.8614854983052842
+      },
+      "monto_atipico": {
+        "n": 11,
+        "score_medio": 0.8994980129875308
+      }
+    }
+  },
+  "prueba_recorte_historia": {
+    "auc_pr_W10": 0.9018977296663026,
+    "auc_pr_W2": 0.8863186605306931,
+    "caida_relativa_pct": 1.7273653789297865,
+    "por_tipo_score_medio_W2": {
+      "cambio_canal": {
+        "n": 16,
+        "score_medio": 0.9668053508357306
+      },
+      "escalada_lenta": {
+        "n": 12,
+        "score_medio": 0.8374578230341275
+      },
+      "escalada_rapida": {
+        "n": 24,
+        "score_medio": 0.9999629581439168
+      },
+      "fraude_sigiloso": {
+        "n": 12,
+        "score_medio": 0.7850839597433837
+      },
+      "monto_atipico": {
+        "n": 11,
+        "score_medio": 0.9119959922625899
+      }
+    }
+  },
+  "apuesta_C": {
+    "hipotesis": "Creemos que combinar el estado oculto del GRU (patron de orden) con las variables agregadas del cliente (escala/nivel de gasto habitual) mejorara el AUC-PR sobre el modelo B solo, porque el GRU normaliza la magnitud absoluta del monto y puede perder la nocion de que tan atipico es un monto para ESE cliente en particular. Lo consideraremos util si el AUC-PR en validacion sube al menos 0.03 respecto al modelo B, sin perder recall en el mecanismo 'escalada_rapida'.",
+    "metrica_exito_declarada": "AUC-PR val (C) >= AUC-PR val (B) + 0.03",
+    "auc_pr_val": 0.9216894359625781,
+    "mejora_vs_B": 0.01979170629627558,
+    "veredicto": "NO CONFIRMADA",
+    "por_tipo_score_medio": {
+      "cambio_canal": 0.8477831036959762,
+      "escalada_lenta": 0.9988297011665718,
+      "escalada_rapida": 0.9999998938252307,
+      "fraude_sigiloso": 0.7352457843328852,
+      "monto_atipico": 0.916420156544913
+    }
+  },
+  "candidato_final": "C",
+  "decision_economica": {
+    "umbral_optimo": 0.075,
+    "costo_val_en_umbral": 22320.0,
+    "test_metrics_en_umbral": {
+      "auc_pr": 0.9590040175848216,
+      "precision": 0.47435897435897434,
+      "recall": 0.9487179487179487,
+      "f1": 0.6324786324786326,
+      "n_pos": 39,
+      "n": 8395
+    },
+    "fn_test": 2,
+    "fp_test": 41,
+    "tp_test": 37,
+    "dias_en_test": 9.860683945153674,
+    "costo_test_Q": 15780.0,
+    "costo_sin_modelo_test_Q": 163800.0,
+    "ahorro_test_Q": 148020.0,
+    "ahorro_mensual_estimado_Q": 450333.8738670825
+  }
+}

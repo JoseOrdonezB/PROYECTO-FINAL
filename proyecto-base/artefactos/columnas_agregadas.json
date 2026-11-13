@@ -1,0 +1,15 @@
+[
+  "n_tx_1h",
+  "n_tx_24h",
+  "div_comercio_7d",
+  "div_canal_7d",
+  "ratio_monto_hist",
+  "n_tx_historicas",
+  "hora",
+  "es_fin_semana",
+  "es_comercio_nuevo",
+  "log_monto",
+  "log_monto_prom_24h",
+  "log_monto_max_dia",
+  "log_horas_desde_ultima"
+]
