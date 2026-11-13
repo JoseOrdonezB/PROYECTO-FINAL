@@ -167,6 +167,63 @@ def _construir_secuencia(transacciones: List[dict], W: int = W_COMPLETO) -> np.n
     return seq[np.newaxis, :, :]  # (1, W, 14)
 
 
+def escalar_seq(Xseq: np.ndarray, mu_col0: float, sd_col0: float,
+                mu_col3: float, sd_col3: float) -> np.ndarray:
+    """
+    Escala solo las columnas continuas (0: log_monto, 3: log_horas_desde_ultima)
+    de una secuencia (B, T, 14) usando estadísticas de train.
+    Réplica la función `escalar_seq` del notebook Proyecto 1.
+    """
+    Xs = Xseq.copy().astype(np.float64)
+    pad = np.abs(Xseq).sum(axis=2) == 0  # (B, T) pasos de relleno
+    Xs[:, :, 0] = (Xseq[:, :, 0] - mu_col0) / (sd_col0 + 1e-6)
+    Xs[:, :, 3] = (Xseq[:, :, 3] - mu_col3) / (sd_col3 + 1e-6)
+    Xs[:, :, 0][pad] = 0.0
+    Xs[:, :, 3][pad] = 0.0
+    return Xs
+
+
+def score_desde_secuencia_escalada(
+    secuencia_escalada: np.ndarray,
+    agregadas_scaled: np.ndarray,
+    umbral: float = None,
+) -> dict:
+    """
+    Puntuación a partir de una secuencia ya construida y escalada (1, W, 14)
+    y agregadas ya escaladas (1, 13). Útil para validación contra el notebook.
+
+    Parámetros
+    ----------
+    secuencia_escalada : np.ndarray, shape (1, W, 14)
+        Secuencia ya procesada con _vector_paso y escalar_seq.
+    agregadas_scaled : np.ndarray, shape (1, 13)
+        Agregadas ya escaladas con scaler_agg.
+    umbral : float, opcional
+        Umbral de decisión.
+
+    Retorna
+    -------
+    dict con claves: puntuacion, decision, umbral.
+    """
+    if _GRU is None:
+        _cargar_artefactos()
+
+    if umbral is None:
+        umbral = _UMBRAL
+
+    _, hidden = _GRU.forward(secuencia_escalada)  # (1, 24)
+    Xc = np.hstack([hidden, agregadas_scaled])    # (1, 37)
+    puntuacion = float(_MODEL_C.predict_proba(Xc)[:, 1][0])
+
+    decision = "bloquear" if puntuacion >= umbral else "autorizar"
+
+    return {
+        "puntuacion": round(puntuacion, 6),
+        "decision": decision,
+        "umbral": umbral,
+    }
+
+
 def _extraer_agregadas(agregadas: Union[dict, list, np.ndarray]) -> np.ndarray:
     """Devuelve las 13 agregadas en el orden del scaler, como (1, 13)."""
     if isinstance(agregadas, dict):
