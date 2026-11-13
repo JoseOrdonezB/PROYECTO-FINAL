@@ -1,0 +1,493 @@
+[
+  {
+    "caso": "Transacción legítima",
+    "entrada": {
+      "transacciones": [
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 85.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 60.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "retail",
+          "monto": 110.0,
+          "hora": 16.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 72.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 70.0,
+          "hora": 13.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 55.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 95.0,
+          "hora": 15.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 80.0
+        },
+        {
+          "canal": "online",
+          "categoria": "retail",
+          "monto": 120.0,
+          "hora": 17.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 66.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 80.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 90.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "servicios",
+          "monto": 100.0,
+          "hora": 15.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 48.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 90.0,
+          "hora": 13.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 70.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "retail",
+          "monto": 105.0,
+          "hora": 16.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 62.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 88.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 75.0
+        }
+      ],
+      "agregadas": {
+        "n_tx_1h": 1,
+        "n_tx_24h": 1,
+        "div_comercio_7d": 2,
+        "div_canal_7d": 1,
+        "ratio_monto_hist": 0.98,
+        "n_tx_historicas": 24,
+        "hora": 14.0,
+        "es_fin_semana": 0,
+        "es_comercio_nuevo": 0,
+        "log_monto": 4.48863636973214,
+        "log_monto_prom_24h": 4.48863636973214,
+        "log_monto_max_dia": 4.48863636973214,
+        "log_horas_desde_ultima": 4.330733340286331
+      }
+    },
+    "salida": {
+      "puntuacion": 0.026721,
+      "puntuacion_pct": "2.7%",
+      "decision": "autorizar",
+      "semaforo": "verde",
+      "umbral": 0.075
+    }
+  },
+  {
+    "caso": "Transacción fraudulenta (escalada rápida)",
+    "entrada": {
+      "transacciones": [
+        {
+          "canal": "online",
+          "categoria": "retail",
+          "monto": 120.0,
+          "hora": 17.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 66.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 80.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 90.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "servicios",
+          "monto": 100.0,
+          "hora": 15.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 48.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 90.0,
+          "hora": 13.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 70.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "retail",
+          "monto": 105.0,
+          "hora": 16.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 62.0
+        },
+        {
+          "canal": "online",
+          "categoria": "retail",
+          "monto": 12.0,
+          "hora": 3.0,
+          "es_nuevo": 1,
+          "horas_desde_ultima": 60.0
+        },
+        {
+          "canal": "online",
+          "categoria": "entretenimiento",
+          "monto": 25.0,
+          "hora": 3.0,
+          "es_nuevo": 1,
+          "horas_desde_ultima": 0.05
+        },
+        {
+          "canal": "online",
+          "categoria": "servicios",
+          "monto": 30.0,
+          "hora": 3.0,
+          "es_nuevo": 1,
+          "horas_desde_ultima": 0.07
+        },
+        {
+          "canal": "online",
+          "categoria": "viajes",
+          "monto": 18.0,
+          "hora": 3.0,
+          "es_nuevo": 1,
+          "horas_desde_ultima": 0.05
+        },
+        {
+          "canal": "online",
+          "categoria": "retail",
+          "monto": 1400.0,
+          "hora": 3.0,
+          "es_nuevo": 1,
+          "horas_desde_ultima": 0.1
+        }
+      ],
+      "agregadas": {
+        "n_tx_1h": 5,
+        "n_tx_24h": 5,
+        "div_comercio_7d": 4,
+        "div_canal_7d": 2,
+        "ratio_monto_hist": 15.0,
+        "n_tx_historicas": 24,
+        "hora": 3.0,
+        "es_fin_semana": 0,
+        "es_comercio_nuevo": 1,
+        "log_monto": 7.244941546337007,
+        "log_monto_prom_24h": 5.697093486505405,
+        "log_monto_max_dia": 7.244941546337007,
+        "log_horas_desde_ultima": 0.09531017980432487
+      }
+    },
+    "salida": {
+      "puntuacion": 0.999998,
+      "puntuacion_pct": "100.0%",
+      "decision": "bloquear",
+      "semaforo": "rojo",
+      "umbral": 0.075
+    }
+  },
+  {
+    "caso": "Caso límite (zona ámbar)",
+    "entrada": {
+      "transacciones": [
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 85.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 60.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "retail",
+          "monto": 110.0,
+          "hora": 16.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 72.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 70.0,
+          "hora": 13.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 55.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 95.0,
+          "hora": 15.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 80.0
+        },
+        {
+          "canal": "online",
+          "categoria": "retail",
+          "monto": 120.0,
+          "hora": 17.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 66.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 80.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 90.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "servicios",
+          "monto": 100.0,
+          "hora": 15.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 48.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 90.0,
+          "hora": 13.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 70.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "retail",
+          "monto": 105.0,
+          "hora": 16.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 62.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 95.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 60.0
+        }
+      ],
+      "agregadas": {
+        "n_tx_1h": 1,
+        "n_tx_24h": 1,
+        "div_comercio_7d": 2,
+        "div_canal_7d": 1,
+        "ratio_monto_hist": 1.0,
+        "n_tx_historicas": 24,
+        "hora": 14.0,
+        "es_fin_semana": 0,
+        "es_comercio_nuevo": 0,
+        "log_monto": 4.564348191467836,
+        "log_monto_prom_24h": 4.564348191467836,
+        "log_monto_max_dia": 4.564348191467836,
+        "log_horas_desde_ultima": 4.110873864173311
+      }
+    },
+    "salida": {
+      "puntuacion": 0.063135,
+      "puntuacion_pct": "6.3%",
+      "decision": "autorizar",
+      "semaforo": "ámbar",
+      "umbral": 0.075
+    }
+  },
+  {
+    "caso": "Error: transacción sin el campo 'monto'",
+    "entrada": {
+      "transacciones": [
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 75.0
+        }
+      ],
+      "agregadas": {
+        "n_tx_1h": 1,
+        "n_tx_24h": 1,
+        "div_comercio_7d": 2,
+        "div_canal_7d": 1,
+        "ratio_monto_hist": 0.98,
+        "n_tx_historicas": 24,
+        "hora": 14.0,
+        "es_fin_semana": 0,
+        "es_comercio_nuevo": 0,
+        "log_monto": 4.48863636973214,
+        "log_monto_prom_24h": 4.48863636973214,
+        "log_monto_max_dia": 4.48863636973214,
+        "log_horas_desde_ultima": 4.330733340286331
+      }
+    },
+    "salida": {
+      "error": "EntradaInvalidaError",
+      "mensaje": "transacciones[0] le faltan campos: ['monto']. Campos requeridos: ['monto', 'hora', 'canal', 'categoria', 'es_nuevo', 'horas_desde_ultima']"
+    }
+  },
+  {
+    "caso": "Error: canal desconocido ('WEB')",
+    "entrada": {
+      "transacciones": [
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 85.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 60.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "retail",
+          "monto": 110.0,
+          "hora": 16.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 72.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 70.0,
+          "hora": 13.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 55.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 95.0,
+          "hora": 15.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 80.0
+        },
+        {
+          "canal": "online",
+          "categoria": "retail",
+          "monto": 120.0,
+          "hora": 17.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 66.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 80.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 90.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "servicios",
+          "monto": 100.0,
+          "hora": 15.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 48.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "comida",
+          "monto": 90.0,
+          "hora": 13.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 70.0
+        },
+        {
+          "canal": "POS",
+          "categoria": "retail",
+          "monto": 105.0,
+          "hora": 16.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 62.0
+        },
+        {
+          "canal": "WEB",
+          "categoria": "comida",
+          "monto": 88.0,
+          "hora": 14.0,
+          "es_nuevo": 0,
+          "horas_desde_ultima": 75.0
+        }
+      ],
+      "agregadas": {
+        "n_tx_1h": 1,
+        "n_tx_24h": 1,
+        "div_comercio_7d": 2,
+        "div_canal_7d": 1,
+        "ratio_monto_hist": 0.98,
+        "n_tx_historicas": 24,
+        "hora": 14.0,
+        "es_fin_semana": 0,
+        "es_comercio_nuevo": 0,
+        "log_monto": 4.48863636973214,
+        "log_monto_prom_24h": 4.48863636973214,
+        "log_monto_max_dia": 4.48863636973214,
+        "log_horas_desde_ultima": 4.330733340286331
+      }
+    },
+    "salida": {
+      "error": "EntradaInvalidaError",
+      "mensaje": "transacciones[9]['canal'] = 'WEB' no es válido. Valores permitidos: ['POS', 'online', 'ATM']"
+    }
+  },
+  {
+    "caso": "Error: lista de transacciones vacía",
+    "entrada": {
+      "transacciones": [],
+      "agregadas": {
+        "n_tx_1h": 1,
+        "n_tx_24h": 1,
+        "div_comercio_7d": 2,
+        "div_canal_7d": 1,
+        "ratio_monto_hist": 0.98,
+        "n_tx_historicas": 24,
+        "hora": 14.0,
+        "es_fin_semana": 0,
+        "es_comercio_nuevo": 0,
+        "log_monto": 4.48863636973214,
+        "log_monto_prom_24h": 4.48863636973214,
+        "log_monto_max_dia": 4.48863636973214,
+        "log_horas_desde_ultima": 4.330733340286331
+      }
+    },
+    "salida": {
+      "error": "EntradaInvalidaError",
+      "mensaje": "transacciones debe ser una lista no vacía de dicts."
+    }
+  }
+]

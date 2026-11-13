@@ -78,10 +78,17 @@ def _ejecutar_notebook_hasta_datos(nb_path: str) -> Dict[str, Any]:
     y devuelve ese namespace con las variables generadas (dfa, Xagg_df,
     Xseq_full, split, y, etc.).
 
-    Nota: se ejecutan TODAS las celdas. Las últimas guardan artefactos y
-    resultados.json en proyecto-base/, lo cual es el comportamiento esperado.
+    Nota: se ejecutan TODAS las celdas. Las últimas guardan artefactos,
+    figuras y resultados.json con rutas relativas, así que se corren dentro de
+    una carpeta temporal para NO sobrescribir artefactos/ del repo (scoring.py
+    debe validarse con los artefactos versionados, no con unos recién entrenados).
     """
+    import tempfile
+
     celdas = _extraer_codigo_celdas(nb_path)
+    dir_original = os.getcwd()
+    dir_temporal = tempfile.mkdtemp(prefix="validar_scoring_")
+    os.chdir(dir_temporal)
 
     namespace: Dict[str, Any] = {
         "__name__": "__validar_scoring__",
@@ -97,6 +104,7 @@ def _ejecutar_notebook_hasta_datos(nb_path: str) -> Dict[str, Any]:
             print(f"[ADVERTENCIA] Celda {i} falló al ejecutarse: {e}")
             # Continuar con las siguientes celdas si es posible
 
+    os.chdir(dir_original)
     return namespace
 
 

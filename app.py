@@ -10,8 +10,11 @@ Ejecutar localmente:
 """
 
 import io
+import json
+import logging
 import os
 import sys
+from datetime import datetime, timezone
 
 import numpy as np
 import pandas as pd
@@ -26,6 +29,32 @@ from scoring import (
 )
 
 st.set_page_config(page_title="Monitoreo de fraude", page_icon="🛡️", layout="wide")
+
+# ---------------------------------------------------------------------------
+# Registro de uso: una línea JSON por predicción o error. Va a stdout (pestaña
+# "Logs" del Space en Hugging Face) y a logs/uso.jsonl cuando se corre local.
+# ---------------------------------------------------------------------------
+LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+LOG_PATH = os.path.join(LOG_DIR, "uso.jsonl")
+logger = logging.getLogger("monitoreo_fraude")
+if not logger.handlers:
+    logger.setLevel(logging.INFO)
+    _h = logging.StreamHandler(sys.stdout)
+    _h.setFormatter(logging.Formatter("%(message)s"))
+    logger.addHandler(_h)
+
+
+def registrar_uso(evento: str, **datos):
+    """Escribe un evento de uso (sin datos personales) en stdout y en logs/uso.jsonl."""
+    linea = json.dumps({"ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "evento": evento, **datos}, ensure_ascii=False)
+    logger.info(linea)
+    try:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        with open(LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(linea + "\n")
+    except OSError:
+        pass  # en el Space el disco puede ser de solo lectura; stdout basta
 
 # ---------------------------------------------------------------------------
 # Constantes de la interfaz
@@ -332,11 +361,16 @@ if st.button("Calcular riesgo", type="primary"):
 
         st.subheader("Resultado")
         mostrar_resultado(resultado)
+        registrar_uso("prediccion", origen=modo, ejemplo=nombre_ej, n_tx=len(transacciones),
+                      puntuacion=round(float(resultado["puntuacion"]), 6),
+                      decision=resultado["decision"], semaforo=resultado["semaforo"],
+                      umbral=resultado["umbral"])
 
         with st.expander("Ver datos enviados al modelo"):
             st.json({"transacciones": transacciones, "agregadas": agregadas})
     except EntradaInvalidaError as e:
         st.error(f"Entrada inválida: {e}")
+        registrar_uso("entrada_invalida", origen=modo, ejemplo=nombre_ej, detalle=str(e))
     except ArtefactosNoEncontradosError as e:
         st.error(f"Faltan archivos del modelo: {e}")
     except Exception as e:  # noqa: BLE001

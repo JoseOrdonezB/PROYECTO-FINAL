@@ -1,0 +1,16 @@
+Intento de despliegue en Hugging Face Spaces (13/11/2026)
+=========================================================
+
+1) Con el SDK de Streamlit (script original):
+   huggingface_hub.errors.BadRequestError: Bad request:
+   * Invalid option: expected one of "gradio"|"docker"|"static" * at sdk
+   -> Hugging Face ya no ofrece Streamlit como SDK directo.
+
+2) Con el SDK de Docker (script actualizado):
+   PS> python despliegue/subir_a_hf.py Ikeel/monitoreo-fraude
+   huggingface_hub.errors.HfHubHTTPError: Client error '402 Payment Required'
+   for url 'https://huggingface.co/api/repos/create'
+   Static Spaces are free for everyone, but hosting Gradio and Docker Spaces on
+   free cpu-basic requires a PRO subscription.
+
+Decisión: desplegar en Streamlit Community Cloud (gratis, conectado al repo de GitHub).

@@ -1,0 +1,97 @@
+======================================================================
+ETAPA 2 — Validación de scoring.py contra resultados.json
+======================================================================
+
+Referencia (resultados.json):
+  Umbral óptimo      : 0.075
+  AUC-PR test        : 0.9590
+  Precisión          : 0.4744
+  Recall             : 0.9487
+  F1                 : 0.6325
+  TP / FP / FN       : 37 / 41 / 2
+  Costo con modelo   : Q15,780
+  Ahorro test        : Q148,020
+
+Ejecutando notebook para reconstruir datos de test...
+Semilla del experimento: 42
+Transacciones totales: 41975
+Tasa de fraude global: 0.715%
+train: 25185  val: 8395  test: 8395
+corte train/val en el dia 26.9, corte val/test en el dia 35.8
+Variables agregadas (Modelo A): ['n_tx_1h', 'n_tx_24h', 'div_comercio_7d', 'div_canal_7d', 'ratio_monto_hist', 'n_tx_historicas', 'hora', 'es_fin_semana', 'es_comercio_nuevo', 'log_monto', 'log_monto_prom_24h', 'log_monto_max_dia', 'log_horas_desde_ultima']
+Forma de las secuencias (Modelo B), W=10: (41975, 10, 14)
+Modelo A -- AUC-PR validacion: 0.8691
+Error relativo maximo del backprop: 1.7402166139286928e-08
+OK: backprop del GRU verificado.
+  epoch  0  loss=0.4311  val_AUC-PR=0.7169
+  epoch  5  loss=0.0963  val_AUC-PR=0.8738
+  epoch 10  loss=0.0683  val_AUC-PR=0.8621
+  epoch 15  loss=0.0406  val_AUC-PR=0.8974
+  epoch 20  loss=0.0106  val_AUC-PR=0.9178
+  epoch 25  loss=0.0065  val_AUC-PR=0.9278
+  epoch 29  loss=0.0139  val_AUC-PR=0.9019
+Modelo B -- AUC-PR validacion: 0.9019
+AUC-PR orden original : 0.9019
+AUC-PR historia barajada: 0.8193
+Caida relativa: 9.2%
+  epoch  0  loss=0.4509  val_AUC-PR=0.6909
+  epoch  5  loss=0.0994  val_AUC-PR=0.8460
+  epoch 10  loss=0.0402  val_AUC-PR=0.8574
+  epoch 15  loss=0.0216  val_AUC-PR=0.8914
+  epoch 20  loss=0.0495  val_AUC-PR=0.8685
+  epoch 25  loss=0.0148  val_AUC-PR=0.8950
+  epoch 29  loss=0.0108  val_AUC-PR=0.8863
+AUC-PR con W=10: 0.9019
+AUC-PR con W=2 : 0.8863
+AUC-PR B: 0.9019   AUC-PR C: 0.9217   mejora: +0.0198
+Veredicto de la apuesta: NO CONFIRMADA
+Candidato final (por AUC-PR en validacion): C
+Umbral optimo (validacion): 0.075   costo esperado en validacion: Q22,320
+TEST (una sola pasada) -> TP=37  FP=41  FN=2
+AUC-PR en test (ranking): 0.9590
+Costo con modelo: Q15,780   Costo sin modelo (dejar pasar todo): Q163,800
+Ahorro en el periodo de prueba (9.9 dias): Q148,020
+Ahorro mensual proyectado: Q450,334
+=== resultados y figuras guardadas correctamente ===
+AUC-PR en test del candidato final: 0.959
+  Transacciones en test: 8395
+  Umbral de scoring.py : 0.075
+  Columnas agregadas   : 13
+
+Ejecutando scoring.score_desde_secuencia_escalada() sobre el set de test...
+  Procesadas 1000 / 8395...
+  Procesadas 2000 / 8395...
+  Procesadas 3000 / 8395...
+  Procesadas 4000 / 8395...
+  Procesadas 5000 / 8395...
+  Procesadas 6000 / 8395...
+  Procesadas 7000 / 8395...
+  Procesadas 8000 / 8395...
+
+======================================================================
+RESULTADOS DE scoring.py vs resultados.json (referencia del plan)
+======================================================================
+
+Metrica                  Esperada     Obtenida   Diferencia
+------------------------------------------------------------
+AUC-PR                     0.9590       0.9590       0.0000
+Precision                  0.4744       0.4744       0.0000
+Recall                     0.9487       0.9487       0.0000
+F1                         0.6325       0.6325       0.0000
+TP                             37           37            0
+FP                             41           41            0
+FN                              2            2            0
+
+======================================================================
+COMPARACIÓN scoring.py vs notebook recién ejecutado (mismo entorno)
+======================================================================
+  Diferencia máxima en puntuaciones : 4.40e-06
+  Diferencia media en puntuaciones  : 1.03e-07
+
+======================================================================
+VEREDICTO
+======================================================================
+  Umbral 0.075 cargado correctamente: SI
+  AUC-PR dentro de tolerancia (0.01): SI
+
+  >>> scoring.py REPRODUCE los resultados del notebook. Etapa 2 APROBADA.
