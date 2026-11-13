@@ -1,0 +1,9 @@
+{
+  "W_completo": 10,
+  "W_recortado": 2,
+  "seed": 42,
+  "umbral_decision": 0.075,
+  "modelo_candidato_final": "C",
+  "costo_fn_Q": 4200.0,
+  "costo_fp_Q": 180.0
+}
